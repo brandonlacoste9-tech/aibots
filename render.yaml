@@ -1,0 +1,34 @@
+# Render Blueprint — Indie Trader desk API
+# Dashboard: New → Blueprint → connect brandonlacoste9-tech/aibots
+# Or: python scripts/render_deploy.py (uses RENDER_API_KEY)
+
+services:
+  - type: web
+    name: indie-trader-api
+    runtime: python
+    plan: free
+    region: oregon
+    branch: main
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn aibots.api:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.11.11"
+      - key: XAI_BASE_URL
+        value: https://api.x.ai/v1
+      - key: XAI_MODEL
+        value: grok-4-1-fast-non-reasoning
+      - key: CORS_ORIGINS
+        value: https://spiffy-tiramisu-613b09.netlify.app,https://indie-trader.com,https://www.indie-trader.com,http://localhost:8080,http://127.0.0.1:8080
+      - key: XAI_API_KEY
+        sync: false
+      - key: MASSIVE_API_KEY
+        sync: false
+      - key: ALPHA_VANTAGE_API_KEY
+        sync: false
+      - key: BIGDATA_API_KEY
+        sync: false
+      - key: FINNHUB_API_KEY
+        sync: false

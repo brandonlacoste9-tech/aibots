@@ -26,7 +26,11 @@
 | `MASSIVE_API_KEY` | Optional Massive/Polygon news + prev-close |
 | `MASSIVE_BASE_URL` | Optional; default `https://api.polygon.io` |
 | `BIGDATA_API_KEY` | Optional RavenPack Bigdata (`bd_v2_…`) company KG / news |
+| `RENDER_API_KEY` | Optional — deploy/manage API via `scripts/render_deploy.py` |
 | `AIBOTS_JOURNAL_PATH` | Optional path; no secret |
+
+Public desk API (Render): `https://indie-trader-api.onrender.com`  
+Never put secrets on Netlify static site — only on Render env vars.
 
 If a key was pasted into chat, treat it as exposed: rotate at the provider when practical.
 Marketing site on Netlify is static HTML only — **no** LLM keys required there.
