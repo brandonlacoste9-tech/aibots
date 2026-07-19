@@ -153,3 +153,6 @@ venv/
 dist/
 build/
 journal.jsonl
+
+.superpowers/
+
