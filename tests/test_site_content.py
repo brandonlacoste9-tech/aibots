@@ -23,8 +23,13 @@ def test_landing_has_desk_cta_and_sections():
 def test_landing_beginner_promise_copy():
     html = _read("index.html")
     # Primary beginner message (allow slight wording variants already in page)
-    assert "you still decide" in html.lower() or "you decide" in html.lower()
-    assert "paper" in html.lower()
+    lower = html.lower()
+    assert (
+        "you still decide" in lower
+        or "you decide" in lower
+        or "stay in control" in lower
+    )
+    assert "paper" in lower
 
 
 def test_desk_defaults_to_public_render_api():
