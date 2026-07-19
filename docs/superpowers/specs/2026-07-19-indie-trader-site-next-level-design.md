@@ -1,7 +1,7 @@
 # Indie Trader website — next-level vertical slice
 
 **Date:** 2026-07-19  
-**Status:** Design approved in conversation; awaiting user review of this written spec  
+**Status:** Implemented (vertical slice shipped on main; Netlify redeploy from push)  
 **Product:** Indie Trader (`brandonlacoste9-tech/aibots`)  
 **Primary metric:** Visitor opens the desk and successfully asks a first market question  
 
