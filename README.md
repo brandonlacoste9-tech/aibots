@@ -1,9 +1,13 @@
-# aibots
+# aibots · Indie Trader
 
-Research brain for a paper-trading desk: **proposes**, never submits orders.
+Research brain for **[Indie Trader](https://indie-trader.com)** — an AI trading bot site for paper practice: **proposes**, never submits orders.
 
-**Docs site (Netlify):** https://spiffy-tiramisu-613b09.netlify.app  
-(Static landing page only — the research loop runs via CLI/API, not in the browser.)
+| | |
+|--|--|
+| **Product** | Indie Trader |
+| **Domain** | https://indie-trader.com |
+| **Netlify (until DNS)** | https://spiffy-tiramisu-613b09.netlify.app |
+| **Engine package** | `aibots` (this repo) |
 
 Standalone library you can wire into [tradingbot](https://github.com/brandonlacoste9-tech/tradingbot) (or any control plane) later. Control plane stays external: LLM proposes → policy gate → human confirm → journal.
 

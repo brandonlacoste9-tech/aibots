@@ -3,11 +3,19 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>aibots — research brain for paper trading</title>
+    <title>Indie Trader — AI paper trading desk</title>
     <meta
       name="description"
-      content="aibots proposes paper trades with forced market tools and a bear-case critic. Never submits orders."
+      content="Indie Trader is an AI trading bot for paper practice. Research, bull proposal, bear critique, human confirm. Never submits live orders."
     />
+    <link rel="canonical" href="https://indie-trader.com/" />
+    <meta property="og:title" content="Indie Trader — AI paper trading desk" />
+    <meta
+      property="og:description"
+      content="AI researches. You confirm. Paper trades only — forced market tools, bull thesis, bear critique, journaled decisions."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://indie-trader.com/" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -16,15 +24,15 @@
     />
     <style>
       :root {
-        --bg: #0b0f14;
-        --panel: #121821;
+        --bg: #070b10;
+        --panel: #0f1520;
         --line: #243041;
-        --text: #e8eef7;
+        --text: #eef3fa;
         --muted: #8b9bb0;
         --good: #3dd68c;
         --bad: #f07178;
         --accent: #5b9cff;
-        --warn: #e6c07b;
+        --gold: #e6c07b;
       }
       * {
         box-sizing: border-box;
@@ -33,50 +41,113 @@
         margin: 0;
         min-height: 100vh;
         font-family: "IBM Plex Sans", system-ui, sans-serif;
-        background:
-          radial-gradient(1200px 600px at 10% -10%, #1a2740 0%, transparent 55%),
-          radial-gradient(900px 500px at 100% 0%, #14281f 0%, transparent 50%),
-          var(--bg);
         color: var(--text);
+        background:
+          radial-gradient(1000px 520px at 8% -15%, #1a2a48 0%, transparent 55%),
+          radial-gradient(800px 420px at 95% 5%, #143028 0%, transparent 45%),
+          var(--bg);
         line-height: 1.55;
       }
-      .wrap {
-        max-width: 880px;
+      .nav {
+        max-width: 1040px;
         margin: 0 auto;
-        padding: 48px 20px 80px;
+        padding: 18px 20px 0;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
       }
-      .badge {
+      .logo {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        text-decoration: none;
+        color: var(--text);
+      }
+      .logo-mark {
+        width: 28px;
+        height: 28px;
+        border-radius: 8px;
+        background: linear-gradient(135deg, var(--accent), var(--good));
+        display: grid;
+        place-items: center;
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 12px;
+        font-weight: 600;
+        color: #061018;
+      }
+      .nav-links {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        align-items: center;
+      }
+      .nav-links a {
+        color: var(--muted);
+        text-decoration: none;
+        font-size: 0.9rem;
+        padding: 8px 10px;
+        border-radius: 8px;
+      }
+      .nav-links a:hover {
+        color: var(--text);
+        background: rgba(255, 255, 255, 0.04);
+      }
+      .wrap {
+        max-width: 1040px;
+        margin: 0 auto;
+        padding: 36px 20px 72px;
+      }
+      .hero {
+        display: grid;
+        gap: 28px;
+        align-items: center;
+      }
+      @media (min-width: 900px) {
+        .hero {
+          grid-template-columns: 1.15fr 0.85fr;
+          gap: 40px;
+          padding-top: 20px;
+        }
+      }
+      .pill {
         display: inline-flex;
         align-items: center;
         gap: 8px;
         font-family: "IBM Plex Mono", monospace;
-        font-size: 12px;
-        letter-spacing: 0.04em;
+        font-size: 11px;
+        letter-spacing: 0.06em;
         text-transform: uppercase;
         color: var(--muted);
         border: 1px solid var(--line);
-        background: rgba(18, 24, 33, 0.8);
+        background: rgba(15, 21, 32, 0.85);
         border-radius: 999px;
         padding: 6px 12px;
       }
       .dot {
-        width: 8px;
-        height: 8px;
+        width: 7px;
+        height: 7px;
         border-radius: 50%;
         background: var(--good);
-        box-shadow: 0 0 12px var(--good);
+        box-shadow: 0 0 10px var(--good);
       }
       h1 {
-        font-size: clamp(2rem, 5vw, 2.75rem);
-        line-height: 1.15;
-        margin: 20px 0 12px;
-        letter-spacing: -0.02em;
+        font-size: clamp(2.2rem, 5.5vw, 3.2rem);
+        line-height: 1.08;
+        margin: 16px 0 14px;
+        letter-spacing: -0.03em;
+      }
+      h1 em {
+        font-style: normal;
+        color: var(--accent);
       }
       .lead {
-        font-size: 1.125rem;
+        font-size: 1.15rem;
         color: var(--muted);
-        max-width: 40rem;
-        margin: 0 0 28px;
+        max-width: 34rem;
+        margin: 0 0 24px;
       }
       .lead strong {
         color: var(--text);
@@ -86,15 +157,16 @@
         display: flex;
         flex-wrap: wrap;
         gap: 12px;
-        margin-bottom: 40px;
+        margin-bottom: 18px;
       }
       a.btn {
         display: inline-flex;
         align-items: center;
+        justify-content: center;
         gap: 8px;
         text-decoration: none;
-        border-radius: 10px;
-        padding: 12px 16px;
+        border-radius: 11px;
+        padding: 13px 18px;
         font-weight: 600;
         font-size: 0.95rem;
         border: 1px solid transparent;
@@ -104,7 +176,7 @@
         color: #061018;
       }
       a.btn-primary:hover {
-        filter: brightness(1.08);
+        filter: brightness(1.07);
       }
       a.btn-ghost {
         background: transparent;
@@ -114,84 +186,134 @@
       a.btn-ghost:hover {
         border-color: var(--muted);
       }
-      .grid {
-        display: grid;
-        gap: 14px;
-        grid-template-columns: 1fr;
-      }
-      @media (min-width: 720px) {
-        .grid.two {
-          grid-template-columns: 1fr 1fr;
-        }
-      }
-      .card {
-        background: rgba(18, 24, 33, 0.9);
-        border: 1px solid var(--line);
-        border-radius: 14px;
-        padding: 18px 18px 16px;
-      }
-      .card h2 {
-        margin: 0 0 10px;
-        font-size: 0.78rem;
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
+      .fine {
+        font-size: 0.85rem;
         color: var(--muted);
-        font-weight: 600;
       }
-      .card p,
-      .card li {
-        color: var(--text);
-        font-size: 0.95rem;
-      }
-      .card ul {
-        margin: 0;
-        padding-left: 1.15rem;
-      }
-      .card li + li {
-        margin-top: 6px;
-      }
-      code,
-      .mono {
-        font-family: "IBM Plex Mono", ui-monospace, monospace;
-      }
-      pre {
-        margin: 0;
-        padding: 14px 16px;
-        overflow-x: auto;
-        background: #0a0e13;
+      .panel {
+        background: rgba(15, 21, 32, 0.92);
         border: 1px solid var(--line);
-        border-radius: 10px;
-        font-family: "IBM Plex Mono", ui-monospace, monospace;
-        font-size: 0.82rem;
-        color: #c9d7ea;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
       }
-      .split {
+      .panel-top {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+        padding: 12px 14px;
+        border-bottom: 1px solid var(--line);
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 11px;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+      .ttl {
+        color: var(--gold);
+      }
+      .ticket {
+        padding: 16px;
+      }
+      .sym {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: baseline;
+        gap: 10px;
+        margin-bottom: 12px;
+      }
+      .side {
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: var(--good);
+      }
+      .ticker {
+        font-size: 1.6rem;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+      }
+      .qty {
+        font-family: "IBM Plex Mono", monospace;
+        color: var(--muted);
+      }
+      .cols {
+        display: grid;
+        gap: 10px;
+        grid-template-columns: 1fr 1fr;
+      }
+      .mini {
+        border-radius: 12px;
+        border: 1px solid var(--line);
+        padding: 12px;
+        background: #0a1018;
+      }
+      .mini.bull {
+        border-color: rgba(61, 214, 140, 0.35);
+      }
+      .mini.bear {
+        border-color: rgba(240, 113, 120, 0.35);
+      }
+      .mini h3 {
+        margin: 0 0 6px;
+        font-size: 0.72rem;
+        letter-spacing: 0.07em;
+        text-transform: uppercase;
+      }
+      .mini.bull h3 {
+        color: var(--good);
+      }
+      .mini.bear h3 {
+        color: var(--bad);
+      }
+      .mini p {
+        margin: 0;
+        font-size: 0.82rem;
+        color: #c7d3e3;
+      }
+      .section {
+        margin-top: 56px;
+      }
+      .section h2 {
+        font-size: 1.35rem;
+        margin: 0 0 8px;
+        letter-spacing: -0.02em;
+      }
+      .section > p {
+        color: var(--muted);
+        margin: 0 0 20px;
+        max-width: 40rem;
+      }
+      .grid3 {
         display: grid;
         gap: 12px;
         grid-template-columns: 1fr;
       }
-      @media (min-width: 720px) {
-        .split {
-          grid-template-columns: 1fr 1fr;
+      @media (min-width: 760px) {
+        .grid3 {
+          grid-template-columns: repeat(3, 1fr);
         }
       }
-      .bull {
-        border-color: rgba(61, 214, 140, 0.35);
-        background: rgba(61, 214, 140, 0.06);
+      .card {
+        background: rgba(15, 21, 32, 0.9);
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        padding: 18px;
       }
-      .bear {
-        border-color: rgba(240, 113, 120, 0.35);
-        background: rgba(240, 113, 120, 0.06);
+      .card .n {
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 0.75rem;
+        color: var(--accent);
+        margin-bottom: 8px;
       }
-      .bull h3 {
-        color: var(--good);
+      .card h3 {
         margin: 0 0 8px;
-        font-size: 0.9rem;
+        font-size: 1.05rem;
       }
-      .bear h3 {
-        color: var(--bad);
-        margin: 0 0 8px;
-        font-size: 0.9rem;
+      .card p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 0.92rem;
       }
       .pipeline {
         display: flex;
@@ -203,20 +325,38 @@
       }
       .step {
         border: 1px solid var(--line);
-        background: #0a0e13;
+        background: #0a1018;
         border-radius: 8px;
-        padding: 8px 10px;
-        color: var(--text);
+        padding: 9px 11px;
       }
       .arrow {
         color: var(--muted);
       }
+      code {
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 0.86em;
+      }
+      pre {
+        margin: 0;
+        padding: 16px;
+        overflow-x: auto;
+        background: #0a1018;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 0.82rem;
+        color: #c9d7ea;
+      }
       footer {
-        margin-top: 40px;
-        padding-top: 20px;
+        margin-top: 56px;
+        padding-top: 22px;
         border-top: 1px solid var(--line);
         color: var(--muted);
-        font-size: 0.85rem;
+        font-size: 0.88rem;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px 24px;
+        justify-content: space-between;
       }
       footer a {
         color: var(--accent);
@@ -224,98 +364,183 @@
     </style>
   </head>
   <body>
+    <nav class="nav" aria-label="Primary">
+      <a class="logo" href="/">
+        <span class="logo-mark" aria-hidden="true">IT</span>
+        Indie Trader
+      </a>
+      <div class="nav-links">
+        <a href="#how">How it works</a>
+        <a href="#safety">Safety</a>
+        <a href="#cli">Get started</a>
+        <a href="https://github.com/brandonlacoste9-tech/aibots">GitHub</a>
+      </div>
+    </nav>
+
     <main class="wrap">
-      <div class="badge"><span class="dot" aria-hidden="true"></span> live · paper research only</div>
-      <h1>aibots</h1>
-      <p class="lead">
-        Research brain for a paper-trading desk.
-        <strong>Proposes</strong>, never submits orders. Forced market tools,
-        one bull proposal, one bear critic — everything journaled for human confirm.
-      </p>
-
-      <div class="actions">
-        <a class="btn btn-primary" href="https://github.com/brandonlacoste9-tech/aibots">
-          View on GitHub
-        </a>
-        <a
-          class="btn btn-ghost"
-          href="https://github.com/brandonlacoste9-tech/aibots#cli"
-        >
-          CLI docs
-        </a>
-      </div>
-
-      <div class="card" style="margin-bottom: 14px">
-        <h2>Control plane</h2>
-        <div class="pipeline" aria-label="research pipeline">
-          <span class="step">forced tools</span>
-          <span class="arrow">→</span>
-          <span class="step">bull proposal</span>
-          <span class="arrow">→</span>
-          <span class="step">bear critic</span>
-          <span class="arrow">→</span>
-          <span class="step">journal</span>
-          <span class="arrow">→</span>
-          <span class="step">human confirms</span>
-        </div>
-      </div>
-
-      <div class="grid two" style="margin-bottom: 14px">
-        <div class="card">
-          <h2>Tools (always first)</h2>
-          <ul>
-            <li><code>get_price_history</code> — yfinance + cache</li>
-            <li><code>compute_indicators</code> — SMA / RSI / MACD / BB</li>
-            <li><code>get_news</code> — Finnhub (optional key)</li>
-          </ul>
-        </div>
-        <div class="card">
-          <h2>Proposals (record only)</h2>
-          <ul>
-            <li><code>propose_order</code> — <code>submitted: false</code></li>
-            <li><code>decide_hold</code> — no trade, still journaled</li>
-            <li>Bear critic uses the <em>same</em> tool outputs</li>
-          </ul>
-        </div>
-      </div>
-
-      <div class="split" style="margin-bottom: 14px">
-        <div class="card bull">
-          <h3>Bull proposal</h3>
-          <p>
-            Model may only propose after forced research. Thesis must cite tool
-            numbers — not invented RSI/MACD.
+      <section class="hero">
+        <div>
+          <div class="pill">
+            <span class="dot" aria-hidden="true"></span>
+            AI trading bot · paper first
+          </div>
+          <h1>Your AI desk that <em>proposes</em>. You still decide.</h1>
+          <p class="lead">
+            <strong>Indie Trader</strong> is an AI trading bot for paper practice.
+            It pulls real market data, builds a bull case, stresses a bear case,
+            then waits for <strong>you</strong> to confirm. No silent live orders.
+          </p>
+          <div class="actions">
+            <a class="btn btn-primary" href="#cli">Start on paper</a>
+            <a
+              class="btn btn-ghost"
+              href="https://github.com/brandonlacoste9-tech/aibots"
+              >View source</a
+            >
+          </div>
+          <p class="fine">
+            Domain: <strong>indie-trader.com</strong> · Research brain open as
+            <code>aibots</code>
           </p>
         </div>
-        <div class="card bear">
-          <h3>Bear critique</h3>
-          <p>
-            One extra pass argues the strongest concrete bear case from the same
-            data. Human sees both sides before confirm.
-          </p>
-        </div>
-      </div>
 
-      <div class="card">
-        <h2>Quick start</h2>
-        <pre>pip install -e ".[dev]"
-cp .env.example .env   # XAI_API_KEY, optional FINNHUB_API_KEY
+        <aside class="panel" aria-label="Example preflight card">
+          <div class="panel-top">
+            <span>Paper preflight</span>
+            <span class="ttl">TTL 2:47</span>
+          </div>
+          <div class="ticket">
+            <div class="sym">
+              <span class="side">Buy</span>
+              <span class="ticker">AAPL</span>
+              <span class="qty">5 @ 189.40 limit</span>
+            </div>
+            <div class="cols">
+              <div class="mini bull">
+                <h3>Bull proposal</h3>
+                <p>
+                  SMA20 &gt; SMA50, RSI mid-60s, constructive close. Small paper
+                  size.
+                </p>
+              </div>
+              <div class="mini bear">
+                <h3>Bear critique</h3>
+                <p>
+                  Extended into resistance; thin news flow. Wait for pullback
+                  risk.
+                </p>
+              </div>
+            </div>
+          </div>
+        </aside>
+      </section>
+
+      <section class="section" id="how">
+        <h2>How the bot works</h2>
+        <p>
+          Not a black-box “auto trader.” Every research turn is forced through
+          tools, then balanced before you confirm.
+        </p>
+        <div class="card" style="margin-bottom: 14px">
+          <div class="pipeline" aria-label="Pipeline">
+            <span class="step">price history</span>
+            <span class="arrow">→</span>
+            <span class="step">indicators</span>
+            <span class="arrow">→</span>
+            <span class="step">news</span>
+            <span class="arrow">→</span>
+            <span class="step">bull proposal</span>
+            <span class="arrow">→</span>
+            <span class="step">bear critic</span>
+            <span class="arrow">→</span>
+            <span class="step">you confirm</span>
+          </div>
+        </div>
+        <div class="grid3">
+          <div class="card">
+            <div class="n">01</div>
+            <h3>Forced research</h3>
+            <p>
+              History, indicators, and headlines run before any proposal. Numbers
+              come from tools — not the model’s memory.
+            </p>
+          </div>
+          <div class="card">
+            <div class="n">02</div>
+            <h3>Bull + bear</h3>
+            <p>
+              One proposal, one skeptical critique on the same data. You review
+              both sides in preflight.
+            </p>
+          </div>
+          <div class="card">
+            <div class="n">03</div>
+            <h3>Human gate</h3>
+            <p>
+              Proposals are record-only until you approve inside a TTL. The bot
+              never submits live brokerage orders.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="safety">
+        <h2>Built for honest paper trading</h2>
+        <p>
+          Designed for people who want AI help without giving up the control
+          plane.
+        </p>
+        <div class="grid3">
+          <div class="card">
+            <h3>No silent fills</h3>
+            <p>
+              <code>propose_order</code> / <code>decide_hold</code> journal only.
+              <code>submitted: false</code> until a human path says otherwise.
+            </p>
+          </div>
+          <div class="card">
+            <h3>Auditable journal</h3>
+            <p>
+              Tool outputs, bull thesis, bear critique, and your decision land
+              side by side for later scorekeeping.
+            </p>
+          </div>
+          <div class="card">
+            <h3>Cloud-safe data</h3>
+            <p>
+              EOD/history via public feeds; optional Finnhub news. Broker market
+              data stays where you put it.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="cli">
+        <h2>Get started</h2>
+        <p>
+          Run the research brain locally today. Wire it into your desk UI when
+          you’re ready.
+        </p>
+        <pre>git clone https://github.com/brandonlacoste9-tech/aibots
+cd aibots
+pip install -e ".[dev]"
+cp .env.example .env   # XAI_API_KEY · optional FINNHUB_API_KEY
 python -m aibots research AAPL
 python -m aibots journal --limit 5</pre>
-      </div>
+      </section>
 
       <footer>
-        <p>
-          This Netlify site is <strong>docs only</strong>. The research loop runs
-          via CLI or an API host — not in the browser.
-        </p>
-        <p>
-          Repo:
-          <a href="https://github.com/brandonlacoste9-tech/aibots"
-            >brandonlacoste9-tech/aibots</a
-          >
-          · package version 0.1.0
-        </p>
+        <div>
+          <strong style="color: var(--text)">Indie Trader</strong>
+          · indie-trader.com
+          <br />
+          AI trading bot for paper practice. Not financial advice. Not a live
+          broker.
+        </div>
+        <div>
+          Engine:
+          <a href="https://github.com/brandonlacoste9-tech/aibots">aibots on GitHub</a>
+        </div>
       </footer>
     </main>
   </body>

@@ -1,15 +1,12 @@
-# aibots is a Python research library. Netlify only hosts the static docs site.
-# Runtime (CLI / agent loop) runs locally or on an API host — not on Netlify.
+# Indie Trader (indie-trader.com) — marketing site for the AI paper trading bot.
+# Engine package is aibots (Python). Runtime stays CLI / API host, not Netlify.
 
 [build]
   publish = "site"
-  # No build command: static HTML only. Do not pip-install requirements.txt.
-  command = "echo 'static site publish only'"
+  command = "echo 'Indie Trader static site'"
 
 [build.environment]
-  # Prevent Netlify from auto-installing Python deps from requirements.txt
-  PYTHON_VERSION = ""
-  NETLIFY_SKIP_PYTHON = "true"
+  NODE_VERSION = "20"
 
 [[headers]]
   for = "/*"
