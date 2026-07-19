@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>aibots — research brain for paper trading</title>
+    <meta
+      name="description"
+      content="aibots proposes paper trades with forced market tools and a bear-case critic. Never submits orders."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #0b0f14;
+        --panel: #121821;
+        --line: #243041;
+        --text: #e8eef7;
+        --muted: #8b9bb0;
+        --good: #3dd68c;
+        --bad: #f07178;
+        --accent: #5b9cff;
+        --warn: #e6c07b;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: "IBM Plex Sans", system-ui, sans-serif;
+        background:
+          radial-gradient(1200px 600px at 10% -10%, #1a2740 0%, transparent 55%),
+          radial-gradient(900px 500px at 100% 0%, #14281f 0%, transparent 50%),
+          var(--bg);
+        color: var(--text);
+        line-height: 1.55;
+      }
+      .wrap {
+        max-width: 880px;
+        margin: 0 auto;
+        padding: 48px 20px 80px;
+      }
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 12px;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        color: var(--muted);
+        border: 1px solid var(--line);
+        background: rgba(18, 24, 33, 0.8);
+        border-radius: 999px;
+        padding: 6px 12px;
+      }
+      .dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--good);
+        box-shadow: 0 0 12px var(--good);
+      }
+      h1 {
+        font-size: clamp(2rem, 5vw, 2.75rem);
+        line-height: 1.15;
+        margin: 20px 0 12px;
+        letter-spacing: -0.02em;
+      }
+      .lead {
+        font-size: 1.125rem;
+        color: var(--muted);
+        max-width: 40rem;
+        margin: 0 0 28px;
+      }
+      .lead strong {
+        color: var(--text);
+        font-weight: 600;
+      }
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-bottom: 40px;
+      }
+      a.btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        text-decoration: none;
+        border-radius: 10px;
+        padding: 12px 16px;
+        font-weight: 600;
+        font-size: 0.95rem;
+        border: 1px solid transparent;
+      }
+      a.btn-primary {
+        background: var(--accent);
+        color: #061018;
+      }
+      a.btn-primary:hover {
+        filter: brightness(1.08);
+      }
+      a.btn-ghost {
+        background: transparent;
+        color: var(--text);
+        border-color: var(--line);
+      }
+      a.btn-ghost:hover {
+        border-color: var(--muted);
+      }
+      .grid {
+        display: grid;
+        gap: 14px;
+        grid-template-columns: 1fr;
+      }
+      @media (min-width: 720px) {
+        .grid.two {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
+      .card {
+        background: rgba(18, 24, 33, 0.9);
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        padding: 18px 18px 16px;
+      }
+      .card h2 {
+        margin: 0 0 10px;
+        font-size: 0.78rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--muted);
+        font-weight: 600;
+      }
+      .card p,
+      .card li {
+        color: var(--text);
+        font-size: 0.95rem;
+      }
+      .card ul {
+        margin: 0;
+        padding-left: 1.15rem;
+      }
+      .card li + li {
+        margin-top: 6px;
+      }
+      code,
+      .mono {
+        font-family: "IBM Plex Mono", ui-monospace, monospace;
+      }
+      pre {
+        margin: 0;
+        padding: 14px 16px;
+        overflow-x: auto;
+        background: #0a0e13;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        font-family: "IBM Plex Mono", ui-monospace, monospace;
+        font-size: 0.82rem;
+        color: #c9d7ea;
+      }
+      .split {
+        display: grid;
+        gap: 12px;
+        grid-template-columns: 1fr;
+      }
+      @media (min-width: 720px) {
+        .split {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
+      .bull {
+        border-color: rgba(61, 214, 140, 0.35);
+        background: rgba(61, 214, 140, 0.06);
+      }
+      .bear {
+        border-color: rgba(240, 113, 120, 0.35);
+        background: rgba(240, 113, 120, 0.06);
+      }
+      .bull h3 {
+        color: var(--good);
+        margin: 0 0 8px;
+        font-size: 0.9rem;
+      }
+      .bear h3 {
+        color: var(--bad);
+        margin: 0 0 8px;
+        font-size: 0.9rem;
+      }
+      .pipeline {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        align-items: center;
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 0.78rem;
+      }
+      .step {
+        border: 1px solid var(--line);
+        background: #0a0e13;
+        border-radius: 8px;
+        padding: 8px 10px;
+        color: var(--text);
+      }
+      .arrow {
+        color: var(--muted);
+      }
+      footer {
+        margin-top: 40px;
+        padding-top: 20px;
+        border-top: 1px solid var(--line);
+        color: var(--muted);
+        font-size: 0.85rem;
+      }
+      footer a {
+        color: var(--accent);
+      }
+    </style>
+  </head>
+  <body>
+    <main class="wrap">
+      <div class="badge"><span class="dot" aria-hidden="true"></span> live · paper research only</div>
+      <h1>aibots</h1>
+      <p class="lead">
+        Research brain for a paper-trading desk.
+        <strong>Proposes</strong>, never submits orders. Forced market tools,
+        one bull proposal, one bear critic — everything journaled for human confirm.
+      </p>
+
+      <div class="actions">
+        <a class="btn btn-primary" href="https://github.com/brandonlacoste9-tech/aibots">
+          View on GitHub
+        </a>
+        <a
+          class="btn btn-ghost"
+          href="https://github.com/brandonlacoste9-tech/aibots#cli"
+        >
+          CLI docs
+        </a>
+      </div>
+
+      <div class="card" style="margin-bottom: 14px">
+        <h2>Control plane</h2>
+        <div class="pipeline" aria-label="research pipeline">
+          <span class="step">forced tools</span>
+          <span class="arrow">→</span>
+          <span class="step">bull proposal</span>
+          <span class="arrow">→</span>
+          <span class="step">bear critic</span>
+          <span class="arrow">→</span>
+          <span class="step">journal</span>
+          <span class="arrow">→</span>
+          <span class="step">human confirms</span>
+        </div>
+      </div>
+
+      <div class="grid two" style="margin-bottom: 14px">
+        <div class="card">
+          <h2>Tools (always first)</h2>
+          <ul>
+            <li><code>get_price_history</code> — yfinance + cache</li>
+            <li><code>compute_indicators</code> — SMA / RSI / MACD / BB</li>
+            <li><code>get_news</code> — Finnhub (optional key)</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h2>Proposals (record only)</h2>
+          <ul>
+            <li><code>propose_order</code> — <code>submitted: false</code></li>
+            <li><code>decide_hold</code> — no trade, still journaled</li>
+            <li>Bear critic uses the <em>same</em> tool outputs</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="split" style="margin-bottom: 14px">
+        <div class="card bull">
+          <h3>Bull proposal</h3>
+          <p>
+            Model may only propose after forced research. Thesis must cite tool
+            numbers — not invented RSI/MACD.
+          </p>
+        </div>
+        <div class="card bear">
+          <h3>Bear critique</h3>
+          <p>
+            One extra pass argues the strongest concrete bear case from the same
+            data. Human sees both sides before confirm.
+          </p>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Quick start</h2>
+        <pre>pip install -e ".[dev]"
+cp .env.example .env   # XAI_API_KEY, optional FINNHUB_API_KEY
+python -m aibots research AAPL
+python -m aibots journal --limit 5</pre>
+      </div>
+
+      <footer>
+        <p>
+          This Netlify site is <strong>docs only</strong>. The research loop runs
+          via CLI or an API host — not in the browser.
+        </p>
+        <p>
+          Repo:
+          <a href="https://github.com/brandonlacoste9-tech/aibots"
+            >brandonlacoste9-tech/aibots</a
+          >
+          · package version 0.1.0
+        </p>
+      </footer>
+    </main>
+  </body>
+</html>

@@ -2,6 +2,9 @@
 
 Research brain for a paper-trading desk: **proposes**, never submits orders.
 
+**Docs site (Netlify):** https://spiffy-tiramisu-613b09.netlify.app  
+(Static landing page only — the research loop runs via CLI/API, not in the browser.)
+
 Standalone library you can wire into [tradingbot](https://github.com/brandonlacoste9-tech/tradingbot) (or any control plane) later. Control plane stays external: LLM proposes → policy gate → human confirm → journal.
 
 ## What it does
