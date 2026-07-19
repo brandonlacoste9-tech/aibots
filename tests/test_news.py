@@ -46,11 +46,13 @@ async def test_missing_api_key_degrades(monkeypatch):
     monkeypatch.delenv("FINNHUB_API_KEY", raising=False)
     monkeypatch.delenv("ALPHA_VANTAGE_API_KEY", raising=False)
     monkeypatch.delenv("ALPHAVANTAGE_API_KEY", raising=False)
+    monkeypatch.delenv("MASSIVE_API_KEY", raising=False)
+    monkeypatch.delenv("POLYGON_API_KEY", raising=False)
     result = await news.get_news("aapl")
     assert result["ticker"] == "AAPL"
     assert result["items"] == []
     assert result["source"] == "none"
-    assert "API key" in result["note"] or "ALPHA" in result["note"] or "FINNHUB" in result["note"]
+    assert "API key" in result["note"] or "MASSIVE" in result["note"] or "FINNHUB" in result["note"]
 
 
 @pytest.mark.asyncio
@@ -120,6 +122,7 @@ async def test_blank_ticker_raises(monkeypatch):
 @pytest.mark.asyncio
 async def test_alphavantage_fallback_when_no_finnhub(monkeypatch):
     monkeypatch.delenv("FINNHUB_API_KEY", raising=False)
+    monkeypatch.delenv("MASSIVE_API_KEY", raising=False)
     monkeypatch.setenv("ALPHA_VANTAGE_API_KEY", "av-key")
 
     async def fake_av_news(ticker, limit=10):
@@ -138,7 +141,35 @@ async def test_alphavantage_fallback_when_no_finnhub(monkeypatch):
 
     monkeypatch.setattr(news.av, "is_configured", lambda: True)
     monkeypatch.setattr(news.av, "get_news", fake_av_news)
+    monkeypatch.setattr(news.massive_md, "is_configured", lambda: False)
 
     result = await news.get_news("MSFT")
     assert result["source"] == "alphavantage"
     assert result["items"][0]["headline"] == "AV headline"
+
+
+@pytest.mark.asyncio
+async def test_massive_fallback_when_no_finnhub(monkeypatch):
+    monkeypatch.delenv("FINNHUB_API_KEY", raising=False)
+    monkeypatch.setenv("MASSIVE_API_KEY", "m-key")
+
+    async def fake_m_news(ticker, limit=10):
+        return {
+            "ticker": ticker,
+            "items": [
+                {
+                    "headline": "Massive headline",
+                    "datetime": "2024-06-01T12:00:00Z",
+                    "source": "Benzinga",
+                    "url": "https://example.com/m",
+                }
+            ],
+            "source": "massive",
+        }
+
+    monkeypatch.setattr(news.massive_md, "is_configured", lambda: True)
+    monkeypatch.setattr(news.massive_md, "get_news", fake_m_news)
+
+    result = await news.get_news("AAPL")
+    assert result["source"] == "massive"
+    assert result["items"][0]["headline"] == "Massive headline"

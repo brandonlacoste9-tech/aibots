@@ -1,11 +1,10 @@
-"""Company news via Finnhub, with Alpha Vantage NEWS_SENTIMENT fallback.
+"""Company news with multi-provider fallback.
 
 Order:
 1. Finnhub company-news (if FINNHUB_API_KEY set)
-2. Alpha Vantage NEWS_SENTIMENT (if ALPHA_VANTAGE_API_KEY set)
-3. Degrade to empty list with note (never hard-fail research)
-
-Never raises solely for a missing key — research must still complete.
+2. Massive / Polygon reference news (if MASSIVE_API_KEY set)
+3. Alpha Vantage NEWS_SENTIMENT (if ALPHA_VANTAGE_API_KEY set)
+4. Degrade to empty list with note (never hard-fail research)
 """
 
 from __future__ import annotations
@@ -16,6 +15,7 @@ from datetime import date, timedelta
 import httpx
 
 from aibots.tools import alphavantage as av
+from aibots.tools import massive as massive_md
 
 _FINNHUB_URL = "https://finnhub.io/api/v1/company-news"
 _TIMEOUT_S = 15.0
@@ -24,6 +24,10 @@ _TIMEOUT_S = 15.0
 def _finnhub_key() -> str | None:
     key = (os.environ.get("FINNHUB_API_KEY") or "").strip()
     return key or None
+
+
+def _any_news_key() -> bool:
+    return bool(_finnhub_key() or massive_md.is_configured() or av.is_configured())
 
 
 def _normalize_finnhub_item(raw: dict) -> dict:
@@ -88,56 +92,59 @@ async def _finnhub_news(ticker: str, days: int, limit: int) -> dict | None:
     return out
 
 
+def _with_fallback_note(result: dict, notes: list[str]) -> dict:
+    if notes:
+        extra = "fallback after: " + "; ".join(notes)
+        result = dict(result)
+        result["note"] = (result.get("note") + "; " if result.get("note") else "") + extra
+    return result
+
+
 async def get_news(ticker: str, days: int = 7, limit: int = 10) -> dict:
-    """Fetch recent company news headlines for *ticker*.
-
-    Returns::
-
-        {
-          "ticker": "AAPL",
-          "items": [{"headline", "datetime", "source", "url"}, ...],
-          "source": "finnhub" | "alphavantage" | "none",
-          "note": optional degradation note,
-        }
-    """
+    """Fetch recent company news headlines for *ticker*."""
     ticker = (ticker or "").strip().upper()
     if not ticker:
         raise ValueError("ticker must be a non-empty string")
 
     days = max(1, min(int(days), 30))
     limit = max(1, min(int(limit), 50))
-
     notes: list[str] = []
 
     finnhub = await _finnhub_news(ticker, days, limit)
     if finnhub is not None and not finnhub.pop("_failed", False) and finnhub.get("items"):
         return finnhub
     if finnhub is not None:
-        if finnhub.get("note"):
-            notes.append(str(finnhub["note"]))
-        elif finnhub.get("items") == []:
-            notes.append(finnhub.get("note") or "finnhub returned no items")
+        notes.append(str(finnhub.get("note") or "finnhub empty"))
+
+    if massive_md.is_configured():
+        try:
+            m_news = await massive_md.get_news(ticker, limit=limit)
+            if m_news.get("items"):
+                return _with_fallback_note(m_news, notes)
+            if m_news.get("note"):
+                notes.append(str(m_news["note"]))
+        except Exception as exc:  # noqa: BLE001
+            notes.append(f"massive failed: {exc}")
 
     if av.is_configured():
         try:
             av_news = await av.get_news(ticker, limit=limit)
             if av_news.get("items"):
-                if notes:
-                    av_news["note"] = (
-                        av_news.get("note") or ""
-                    ) + (("; " if av_news.get("note") else "") + "fallback after: " + "; ".join(notes))
-                return av_news
+                return _with_fallback_note(av_news, notes)
             if av_news.get("note"):
                 notes.append(str(av_news["note"]))
         except Exception as exc:  # noqa: BLE001
             notes.append(f"alphavantage failed: {exc}")
 
-    if not _finnhub_key() and not av.is_configured():
+    if not _any_news_key():
         return {
             "ticker": ticker,
             "items": [],
             "source": "none",
-            "note": "No news API key configured (set FINNHUB_API_KEY or ALPHA_VANTAGE_API_KEY)",
+            "note": (
+                "No news API key configured "
+                "(set FINNHUB_API_KEY, MASSIVE_API_KEY, or ALPHA_VANTAGE_API_KEY)"
+            ),
         }
 
     return {
