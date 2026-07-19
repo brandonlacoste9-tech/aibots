@@ -313,25 +313,38 @@
       ];
 
       const STORAGE_KEY = "indie_trader_api_base";
+      const LOCAL_DESK = "http://127.0.0.1:8080/desk";
 
       function isLocalHost() {
         const h = location.hostname;
         return h === "localhost" || h === "127.0.0.1" || h === "";
       }
 
+      // HTTPS marketing hosts cannot call a local HTTP API (mixed content).
+      // Bounce users to the local same-origin desk unless a public HTTPS API is set.
+      (function redirectOffHttpsMarketingHost() {
+        const params = new URLSearchParams(location.search);
+        if (params.get("stay") === "1") return;
+        if (location.protocol !== "https:") return;
+        if (isLocalHost()) return;
+        const api = params.get("api") || localStorage.getItem(STORAGE_KEY) || "";
+        if (typeof api === "string" && api.startsWith("https://")) return;
+        location.replace(LOCAL_DESK + (location.hash || ""));
+      })();
+
       function defaultApiBase() {
         // Same-origin when desk is served by aibots API (recommended).
-        if (isLocalHost() && (location.port === "8080" || location.port === "8000")) {
-          return location.origin.replace(/\/$/, "");
+        if (isLocalHost()) {
+          return (location.origin || "http://127.0.0.1:8080").replace(/\/$/, "");
         }
-        // HTTPS Netlify cannot call http://localhost (browser mixed-content block).
-        // Prefer opening http://localhost:8080/desk instead of the Netlify URL.
-        return "http://localhost:8080";
+        return "http://127.0.0.1:8080";
       }
 
       function getApiBase() {
         const q = new URLSearchParams(location.search).get("api");
         if (q) return q.replace(/\/$/, "");
+        // Prefer same-origin when already on local desk — ignore stale Netlify storage.
+        if (isLocalHost()) return defaultApiBase();
         const stored = localStorage.getItem(STORAGE_KEY);
         if (stored) return stored.replace(/\/$/, "");
         return defaultApiBase();
@@ -340,8 +353,8 @@
       function mixedContentHint() {
         if (location.protocol === "https:" && getApiBase().startsWith("http://")) {
           return (
-            "\n\nBrowser block: this page is HTTPS (Netlify) and cannot call an HTTP API. " +
-            "Open the desk at http://localhost:8080/desk instead (same origin as the API)."
+            "\n\nBrowser block: this page is HTTPS and cannot call an HTTP API. " +
+            "Use " + LOCAL_DESK + " while the API is running."
           );
         }
         return "";
