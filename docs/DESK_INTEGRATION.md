@@ -2,7 +2,27 @@
 
 `aibots` is the research brain only. The control plane (tradingbot) owns policy, TTL, confirm UI, and order submit.
 
-## Call from control plane
+## Freeform market Q&A (any question)
+
+```bash
+python -m aibots serve --port 8080
+# Web UI: site/desk.html or /desk on Netlify → set API base URL
+```
+
+```python
+from aibots.agent.market_chat import run_market_chat
+
+out = await run_market_chat(
+    "Why do rate cuts move growth stocks?",
+    api_key=os.environ["XAI_API_KEY"],
+    history=[...],  # optional multi-turn
+)
+# out["assistant_text"], out["tool_calls"], out["history"]
+```
+
+HTTP: `POST /api/chat` with `{ "message": "...", "history": [] }`.
+
+## Call from control plane (paper proposal)
 
 ```python
 import os

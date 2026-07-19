@@ -370,6 +370,7 @@
         Indie Trader
       </a>
       <div class="nav-links">
+        <a href="/desk">Ask the desk</a>
         <a href="#how">How it works</a>
         <a href="#safety">Safety</a>
         <a href="#cli">Get started</a>
@@ -384,14 +385,16 @@
             <span class="dot" aria-hidden="true"></span>
             AI trading bot · paper first
           </div>
-          <h1>Your AI desk that <em>proposes</em>. You still decide.</h1>
+          <h1>Ask anything. Your AI desk that <em>proposes</em> — you still decide.</h1>
           <p class="lead">
-            <strong>Indie Trader</strong> is an AI trading bot for paper practice.
-            It pulls real market data, builds a bull case, stresses a bear case,
-            then waits for <strong>you</strong> to confirm. No silent live orders.
+            <strong>Indie Trader</strong> is an AI trading desk for paper practice.
+            Ask <strong>any</strong> stock-market question — concepts, tickers,
+            technicals, news context — or run a full research turn with bull + bear
+            before you confirm. No silent live orders.
           </p>
           <div class="actions">
-            <a class="btn btn-primary" href="#cli">Start on paper</a>
+            <a class="btn btn-primary" href="/desk">Open market desk</a>
+            <a class="btn btn-ghost" href="#cli">CLI &amp; API</a>
             <a
               class="btn btn-ghost"
               href="https://github.com/brandonlacoste9-tech/aibots"
@@ -518,15 +521,26 @@
       <section class="section" id="cli">
         <h2>Get started</h2>
         <p>
-          Run the research brain locally today. Wire it into your desk UI when
-          you’re ready.
+          Open the web desk for freeform market Q&amp;A, or run the API + CLI
+          locally.
         </p>
         <pre>git clone https://github.com/brandonlacoste9-tech/aibots
 cd aibots
 pip install -e ".[dev]"
 cp .env.example .env   # XAI_API_KEY · optional FINNHUB_API_KEY
-python -m aibots research AAPL
-python -m aibots journal --limit 5</pre>
+
+# Freeform market Q&amp;A
+python -m aibots ask "What is a PE ratio?"
+python -m aibots ask "How does AAPL look on daily RSI?"
+
+# Desk API (point the web UI at this URL)
+python -m aibots serve --port 8080
+
+# Forced research + bear critic
+python -m aibots research AAPL</pre>
+        <p style="margin-top: 14px">
+          <a class="btn btn-primary" href="/desk">Open desk in browser</a>
+        </p>
       </section>
 
       <footer>

@@ -1,11 +1,13 @@
 """Command-line interface: ``python -m aibots <command>``.
 
 Subcommands:
-- ``research TICKER [--no-critic]`` — run a research turn and journal it.
+- ``ask "question"`` — freeform stock-market Q&A (any topic).
+- ``serve`` — run the desk HTTP API (chat UI points here).
+- ``research TICKER [--no-critic]`` — forced research turn + critic.
 - ``journal [--limit N]`` — print recent journal entries.
 - ``indicators TICKER [--period P]`` — print an indicator table.
 
-aibots researches and proposes; it never submits orders anywhere.
+aibots researches and answers; it never submits orders anywhere.
 """
 from __future__ import annotations
 
@@ -16,6 +18,7 @@ import sys
 from typing import Any
 
 from aibots.agent.loop import run_research_turn
+from aibots.agent.market_chat import run_market_chat
 from aibots.journal import append_entry, read_entries
 from aibots.tools.indicators import compute_indicators
 from aibots.tools.market_data import get_price_history
@@ -27,11 +30,31 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="aibots",
         description=(
-            "Research brain for a paper-trading desk. "
-            "Researches tickers and proposes paper trades; never submits orders."
+            "Indie Trader research brain. "
+            "Answers market questions and proposes paper trades; never submits orders."
         ),
     )
     sub = parser.add_subparsers(dest="command", required=True)
+
+    p_ask = sub.add_parser(
+        "ask",
+        help="Ask any stock-market question (concepts, tickers, technicals, news).",
+    )
+    p_ask.add_argument("question", nargs="+", help="Your market question.")
+    p_ask.add_argument(
+        "--no-journal",
+        action="store_true",
+        help="Do not append this turn to the journal.",
+    )
+    p_ask.set_defaults(func=_cmd_ask)
+
+    p_serve = sub.add_parser(
+        "serve",
+        help="Run the desk HTTP API for the web chat UI (uvicorn).",
+    )
+    p_serve.add_argument("--host", default="0.0.0.0")
+    p_serve.add_argument("--port", type=int, default=8080)
+    p_serve.set_defaults(func=_cmd_serve)
 
     p_research = sub.add_parser(
         "research", help="Run an agent research turn on a ticker and journal the result."
@@ -63,6 +86,80 @@ def build_parser() -> argparse.ArgumentParser:
 def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     return args.func(args)
+
+
+# --- ask (freeform market Q&A) ------------------------------------------------
+
+
+def _cmd_ask(args: argparse.Namespace) -> int:
+    api_key = os.environ.get("XAI_API_KEY")
+    if not api_key:
+        print(
+            "Error: XAI_API_KEY is not set.\n"
+            "Copy .env.example to .env and set your xAI key.",
+            file=sys.stderr,
+        )
+        return EXIT_USAGE
+
+    question = " ".join(args.question).strip()
+    try:
+        result = asyncio.run(
+            run_market_chat(
+                question,
+                api_key=api_key,
+                model=os.environ.get("XAI_MODEL") or None,
+                base_url=os.environ.get("XAI_BASE_URL") or None,
+            )
+        )
+    except Exception as exc:  # noqa: BLE001
+        print(f"Error: {exc}", file=sys.stderr)
+        return 1
+
+    print(result.get("assistant_text") or "")
+    tools = result.get("tool_calls") or []
+    if tools:
+        names = ", ".join(
+            f"{t.get('name')}{'' if t.get('ok') else ' (failed)'}" for t in tools
+        )
+        print(f"\n[tools: {names}]", file=sys.stderr)
+
+    if not args.no_journal:
+        stored = append_entry(
+            {
+                "mode": "market_chat",
+                "user_message": question,
+                "assistant_text": result.get("assistant_text"),
+                "tool_calls": tools,
+                "model": result.get("model"),
+            }
+        )
+        print(f"\nJournaled as {stored.get('id', '?')[:8]}…", file=sys.stderr)
+    return 0
+
+
+def _cmd_serve(args: argparse.Namespace) -> int:
+    try:
+        import uvicorn
+    except ImportError:
+        print(
+            "Error: uvicorn/fastapi not installed. pip install 'aibots[server]' "
+            "or: pip install fastapi uvicorn",
+            file=sys.stderr,
+        )
+        return EXIT_USAGE
+    if not os.environ.get("XAI_API_KEY"):
+        print(
+            "Warning: XAI_API_KEY is not set — /api/chat will return 503.",
+            file=sys.stderr,
+        )
+    print(
+        f"Indie Trader API on http://{args.host}:{args.port}\n"
+        f"Open the desk UI and set API base to this URL.\n"
+        f"  site/desk.html  or  https://spiffy-tiramisu-613b09.netlify.app/desk.html",
+        file=sys.stderr,
+    )
+    uvicorn.run("aibots.api:app", host=args.host, port=args.port, reload=False)
+    return 0
 
 
 # --- research -----------------------------------------------------------------

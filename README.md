@@ -13,7 +13,22 @@ Research brain for **[Indie Trader](https://indie-trader.com)** — an AI tradin
 
 Standalone library you can wire into [tradingbot](https://github.com/brandonlacoste9-tech/tradingbot) (or any control plane) later. Control plane stays external: LLM proposes → policy gate → human confirm → journal.
 
-### Desk one-liner
+### Market desk (any question)
+
+**Web UI:** [/desk](https://spiffy-tiramisu-613b09.netlify.app/desk) — ask anything about the stock market.
+
+```bash
+# API (required for the web desk)
+export XAI_API_KEY=...
+python -m aibots serve --port 8080
+# Open /desk and set API base to http://localhost:8080 (API button)
+
+# CLI freeform Q&A
+python -m aibots ask "What is a PE ratio?"
+python -m aibots ask "How does NVDA look on daily technicals?"
+```
+
+### Forced research one-liner (paper proposal)
 
 ```python
 from aibots import research_for_desk, set_human_decision

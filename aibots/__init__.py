@@ -11,7 +11,7 @@ from .journal import append_entry, read_entries, set_human_decision
 from .preflight import research_for_desk, to_preflight_payload
 from .schemas import TOOL_NAMES, as_anthropic_tools, as_openai_tools
 
-__version__ = "0.1.1"
+__version__ = "0.2.0"
 
 __all__ = [
     "__version__",
