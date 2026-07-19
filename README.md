@@ -11,6 +11,9 @@ Research brain for **[Indie Trader](https://indie-trader.com)** — an AI tradin
 | **Desk contract** | [docs/DESK_INTEGRATION.md](docs/DESK_INTEGRATION.md) |
 | **Secrets** | [docs/SECRETS.md](docs/SECRETS.md) |
 
+**Try the desk:** https://spiffy-tiramisu-613b09.netlify.app/desk  
+**API health:** https://indie-trader-api.onrender.com/health
+
 Standalone library you can wire into [tradingbot](https://github.com/brandonlacoste9-tech/tradingbot) (or any control plane) later. Control plane stays external: LLM proposes → policy gate → human confirm → journal.
 
 ### Market desk (any question)
