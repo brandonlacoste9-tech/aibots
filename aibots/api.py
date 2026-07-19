@@ -149,3 +149,36 @@ async def chat_get_hint() -> dict[str, str]:
     return {
         "hint": "POST JSON { message, history? } to this path from the desk UI.",
     }
+
+
+# --- Static marketing + desk UI (same-origin with the API) -------------------
+
+_SITE_DIR = Path(__file__).resolve().parents[1] / "site"
+
+
+@app.get("/")
+async def site_home():
+    from fastapi.responses import FileResponse
+
+    index = _SITE_DIR / "index.html"
+    if not index.is_file():
+        return {"ok": True, "service": "indie-trader", "desk": "/desk"}
+    return FileResponse(index)
+
+
+@app.get("/desk")
+@app.get("/desk.html")
+async def site_desk():
+    from fastapi.responses import FileResponse
+
+    desk = _SITE_DIR / "desk.html"
+    if not desk.is_file():
+        raise HTTPException(404, "desk UI not found — is site/desk.html present?")
+    return FileResponse(desk)
+
+
+@app.get("/favicon.ico")
+async def favicon():
+    from fastapi.responses import Response
+
+    return Response(status_code=204)

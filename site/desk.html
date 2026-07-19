@@ -313,12 +313,38 @@
       ];
 
       const STORAGE_KEY = "indie_trader_api_base";
-      const DEFAULT_API = "http://localhost:8080";
+
+      function isLocalHost() {
+        const h = location.hostname;
+        return h === "localhost" || h === "127.0.0.1" || h === "";
+      }
+
+      function defaultApiBase() {
+        // Same-origin when desk is served by aibots API (recommended).
+        if (isLocalHost() && (location.port === "8080" || location.port === "8000")) {
+          return location.origin.replace(/\/$/, "");
+        }
+        // HTTPS Netlify cannot call http://localhost (browser mixed-content block).
+        // Prefer opening http://localhost:8080/desk instead of the Netlify URL.
+        return "http://localhost:8080";
+      }
 
       function getApiBase() {
         const q = new URLSearchParams(location.search).get("api");
         if (q) return q.replace(/\/$/, "");
-        return (localStorage.getItem(STORAGE_KEY) || DEFAULT_API).replace(/\/$/, "");
+        const stored = localStorage.getItem(STORAGE_KEY);
+        if (stored) return stored.replace(/\/$/, "");
+        return defaultApiBase();
+      }
+
+      function mixedContentHint() {
+        if (location.protocol === "https:" && getApiBase().startsWith("http://")) {
+          return (
+            "\n\nBrowser block: this page is HTTPS (Netlify) and cannot call an HTTP API. " +
+            "Open the desk at http://localhost:8080/desk instead (same origin as the API)."
+          );
+        }
+        return "";
       }
 
       let history = [];
@@ -448,7 +474,10 @@
             "system",
             "Could not reach the desk API: " +
               (err && err.message ? err.message : String(err)) +
-              "\n\nStart the API: uvicorn aibots.api:app --port 8080\nThen set the API URL (API button) to http://localhost:8080"
+              "\n\n1) Start API:  python -m aibots serve --port 8080" +
+              "\n2) Open desk:  http://localhost:8080/desk" +
+              "\n   (Do not use the HTTPS Netlify URL against localhost — browsers block it.)" +
+              mixedContentHint()
           );
           dot.className = "dot bad";
           statusText.textContent = "request failed";

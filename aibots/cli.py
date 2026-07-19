@@ -166,10 +166,12 @@ def _cmd_serve(args: argparse.Namespace) -> int:
             "Warning: XAI_API_KEY is not set — /api/chat will return 503.",
             file=sys.stderr,
         )
+    display_host = "127.0.0.1" if args.host in ("0.0.0.0", "::") else args.host
     print(
-        f"Indie Trader API on http://{args.host}:{args.port}\n"
-        f"Open the desk UI and set API base to this URL.\n"
-        f"  site/desk.html  or  https://spiffy-tiramisu-613b09.netlify.app/desk.html",
+        f"Indie Trader API on http://{display_host}:{args.port}\n"
+        f"Open the desk (same origin — required):\n"
+        f"  http://{display_host}:{args.port}/desk\n"
+        f"Do not use the HTTPS Netlify page against localhost (browser blocks mixed content).",
         file=sys.stderr,
     )
     uvicorn.run("aibots.api:app", host=args.host, port=args.port, reload=False)
