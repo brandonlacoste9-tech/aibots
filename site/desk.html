@@ -442,7 +442,7 @@
           /* fallthrough */
         }
         dot.className = "dot bad";
-        statusText.textContent = "API offline · set URL (API button)";
+        statusText.textContent = "API offline or waking…";
       }
 
       document.getElementById("gearBtn").onclick = () => {
@@ -466,8 +466,13 @@
         statusText.textContent = "Thinking…";
         dot.className = "dot warn";
 
+        let coldTimer = null;
         try {
           const base = getApiBase();
+          coldTimer = setTimeout(() => {
+            statusText.textContent = "Still working (API may be waking)…";
+            dot.className = "dot warn";
+          }, 8000);
           const r = await fetch(base + "/api/chat", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -498,16 +503,16 @@
         } catch (err) {
           addMsg(
             "system",
-            "Could not reach the desk API: " +
+            "Could not reach the desk API (" +
               (err && err.message ? err.message : String(err)) +
-              "\n\n1) Start API:  python -m aibots serve --port 8080" +
-              "\n2) Open desk:  http://localhost:8080/desk" +
-              "\n   (Do not use the HTTPS Netlify URL against localhost — browsers block it.)" +
+              ").\n\nIf this is the first request in a while, the free API may be waking up — wait 30–60s and try again.\n\nAPI: " +
+              getApiBase() +
               mixedContentHint()
           );
           dot.className = "dot bad";
           statusText.textContent = "request failed";
         } finally {
+          if (coldTimer) clearTimeout(coldTimer);
           sendBtn.disabled = false;
           input.focus();
         }

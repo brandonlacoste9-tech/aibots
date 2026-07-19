@@ -51,3 +51,14 @@ def test_desk_has_beginner_suggestion_chips_source():
     html = _read("desk.html")
     assert "PE ratio" in html or "P/E" in html or "pe ratio" in html.lower()
     assert "SUGGESTIONS" in html
+
+
+def test_landing_has_example_journal_or_safety_points():
+    html = _read("index.html")
+    assert "id=\"safety\"" in html or "id='safety'" in html
+    assert "silent" in html.lower() or "live order" in html.lower() or "never" in html.lower()
+
+
+def test_desk_first_run_hook_present():
+    html = _read("desk.html")
+    assert "first_run" in html.lower() or "firstRun" in html or "Got it" in html
