@@ -5,11 +5,23 @@ Research brain for **[Indie Trader](https://indie-trader.com)** — an AI tradin
 | | |
 |--|--|
 | **Product** | Indie Trader |
-| **Domain** | https://indie-trader.com |
+| **Domain** | https://indie-trader.com (DNS setup: [docs/DNS.md](docs/DNS.md)) |
 | **Netlify (until DNS)** | https://spiffy-tiramisu-613b09.netlify.app |
 | **Engine package** | `aibots` (this repo) |
+| **Desk contract** | [docs/DESK_INTEGRATION.md](docs/DESK_INTEGRATION.md) |
+| **Secrets** | [docs/SECRETS.md](docs/SECRETS.md) |
 
 Standalone library you can wire into [tradingbot](https://github.com/brandonlacoste9-tech/tradingbot) (or any control plane) later. Control plane stays external: LLM proposes → policy gate → human confirm → journal.
+
+### Desk one-liner
+
+```python
+from aibots import research_for_desk, set_human_decision
+
+preflight = await research_for_desk("Research AAPL…", api_key=..., ttl_seconds=180)
+# show preflight["bull"] / preflight["bear"] side-by-side
+set_human_decision(preflight["journal_id"], "confirm")  # or reject
+```
 
 ## What it does
 

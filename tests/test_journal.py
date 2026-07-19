@@ -5,6 +5,8 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+import pytest
+
 from aibots.journal import append_entry, read_entries
 
 
@@ -80,3 +82,59 @@ def test_malformed_lines_skipped(tmp_path: Path):
     path.write_text('{"ok": 1}\nnot-json\n\n{"ok": 2}\n', encoding="utf-8")
     entries = read_entries(path=str(path))
     assert [e["ok"] for e in entries] == [1, 2]
+
+
+def test_set_human_decision_confirm(tmp_path: Path):
+    from aibots.journal import set_human_decision
+
+    path = str(tmp_path / "journal.jsonl")
+    a = append_entry({"user_message": "research AAPL"}, path=path)
+    b = append_entry({"user_message": "research MSFT"}, path=path)
+
+    updated = set_human_decision(a["id"], "confirm", path=path)
+    assert updated is not None
+    assert updated["human_decision"] == "confirm"
+    assert updated["decided_at"]
+    assert updated["decided_at"].endswith("+00:00") or updated["decided_at"].endswith("Z")
+
+    entries = read_entries(path=path, limit=10)
+    assert entries[0]["id"] == a["id"]
+    assert entries[0]["human_decision"] == "confirm"
+    assert entries[1]["id"] == b["id"]
+    assert entries[1]["human_decision"] is None
+
+
+def test_set_human_decision_with_notes_and_reject(tmp_path: Path):
+    from aibots.journal import set_human_decision
+
+    path = str(tmp_path / "journal.jsonl")
+    stored = append_entry({"ticker": "NVDA"}, path=path)
+    updated = set_human_decision(
+        stored["id"], "reject", notes="size too large", path=path
+    )
+    assert updated["human_decision"] == "reject"
+    assert updated["human_notes"] == "size too large"
+
+
+def test_set_human_decision_missing_id_returns_none(tmp_path: Path):
+    from aibots.journal import set_human_decision
+
+    path = str(tmp_path / "journal.jsonl")
+    append_entry({"x": 1}, path=path)
+    assert set_human_decision("does-not-exist", "confirm", path=path) is None
+
+
+def test_set_human_decision_invalid_raises(tmp_path: Path):
+    from aibots.journal import set_human_decision
+
+    path = str(tmp_path / "journal.jsonl")
+    stored = append_entry({"x": 1}, path=path)
+    with pytest.raises(ValueError, match="decision must be"):
+        set_human_decision(stored["id"], "maybe", path=path)
+
+
+def test_append_defaults_human_fields(tmp_path: Path):
+    path = str(tmp_path / "journal.jsonl")
+    stored = append_entry({"user_message": "hi"}, path=path)
+    assert stored["human_decision"] is None
+    assert stored["decided_at"] is None

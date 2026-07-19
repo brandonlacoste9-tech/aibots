@@ -76,3 +76,81 @@ def test_context_tails_length_5():
     assert len(result["context"]["close_series_tail"]) == 5
     assert len(result["context"]["sma_20_series_tail"]) == 5
     assert result["context"]["close_series_tail"][-1] == 29.0
+
+
+# --- Regression / property baselines (fixed synthetic series) -----------------
+
+# Oldest → newest. Mild uptrend used as a frozen fixture.
+CLOSES_BASE = [
+    100,
+    102,
+    101,
+    103,
+    105,
+    104,
+    106,
+    108,
+    107,
+    109,
+    111,
+    110,
+    112,
+    114,
+    113,
+    115,
+    117,
+    116,
+    118,
+    120,
+]
+
+# Golden values from aibots pure-Python Wilder RSI / EMA MACD / population BB
+# (freeze against accidental formula drift; re-compute only with intentional changes).
+_GOLDEN_LONG = CLOSES_BASE * 3  # 60 bars — enough for MACD signal (needs ~34)
+
+
+def test_rsi_14_range_and_golden_value():
+    result = compute_indicators(_bars(CLOSES_BASE), indicators=["rsi_14"])
+    rsi = result["latest"]["rsi_14"]
+    assert rsi is not None
+    assert 0.0 <= rsi <= 100.0
+    # Uptrend series → RSI elevated
+    assert rsi > 50.0
+    # Golden: Wilder RSI-14 on CLOSES_BASE (frozen pure-Python baseline)
+    assert abs(rsi - 81.7864) < 1e-4
+
+
+def test_macd_signal_and_histogram_golden():
+    result = compute_indicators(_bars(_GOLDEN_LONG), indicators=["macd"])
+    macd = result["latest"]["macd"]
+    assert macd["macd"] is not None
+    assert macd["signal"] is not None
+    assert macd["histogram"] is not None
+    # histogram == macd - signal (within float packing)
+    assert abs(macd["histogram"] - (macd["macd"] - macd["signal"])) < 1e-6
+    # Golden on CLOSES_BASE * 3
+    assert abs(macd["macd"] - 2.3627) < 1e-4
+    assert abs(macd["signal"] - 1.2044) < 1e-4
+    assert abs(macd["histogram"] - 1.1583) < 1e-4
+
+
+def test_bbands_order_and_golden():
+    result = compute_indicators(_bars(CLOSES_BASE), indicators=["bbands"])
+    bb = result["latest"]["bbands"]
+    assert bb["upper"] > bb["middle"] > bb["lower"]
+    # middle is SMA20 of the 20 closes; bands use population stddev * 2
+    assert abs(bb["middle"] - 109.55) < 1e-4
+    assert abs(bb["upper"] - 121.2543) < 1e-4
+    assert abs(bb["lower"] - 97.8457) < 1e-4
+
+
+def test_rsi_all_equal_is_fifty():
+    result = compute_indicators(_bars([50.0] * 30), indicators=["rsi_14"])
+    assert result["latest"]["rsi_14"] == 50.0
+
+
+def test_rsi_strict_uptrend_near_100():
+    closes = [100.0 + i for i in range(40)]
+    result = compute_indicators(_bars(closes), indicators=["rsi_14"])
+    assert result["latest"]["rsi_14"] is not None
+    assert result["latest"]["rsi_14"] > 90.0

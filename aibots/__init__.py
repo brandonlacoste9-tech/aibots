@@ -7,10 +7,11 @@ from __future__ import annotations
 
 from importlib import import_module
 
-from .journal import append_entry, read_entries
+from .journal import append_entry, read_entries, set_human_decision
+from .preflight import research_for_desk, to_preflight_payload
 from .schemas import TOOL_NAMES, as_anthropic_tools, as_openai_tools
 
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 
 __all__ = [
     "__version__",
@@ -19,6 +20,9 @@ __all__ = [
     "as_anthropic_tools",
     "append_entry",
     "read_entries",
+    "set_human_decision",
+    "to_preflight_payload",
+    "research_for_desk",
     "run_research_turn",
     "tools",
     "agent",
@@ -27,7 +31,7 @@ __all__ = [
 
 def __getattr__(name: str):
     """Lazy submodule access so `aibots` imports even if optional deps are absent."""
-    if name in {"tools", "agent"}:
+    if name in {"tools", "agent", "preflight"}:
         return import_module(f"aibots.{name}")
     if name == "run_research_turn":
         return import_module("aibots.agent.loop").run_research_turn
