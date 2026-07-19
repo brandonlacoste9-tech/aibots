@@ -274,6 +274,7 @@
           <span class="dot" id="dot"></span>
           <span id="statusText">checking API…</span>
         </div>
+        <span style="border:1px solid rgba(61,214,140,.4);color:#3dd68c;font-size:11px;padding:4px 10px;border-radius:999px;text-transform:uppercase;letter-spacing:.04em;font-family:IBM Plex Mono,monospace">Paper</span>
         <button type="button" class="gear" id="gearBtn" title="API settings">API</button>
         <div class="links">
           <a href="/">Home</a>
@@ -289,6 +290,12 @@
     </div>
 
     <main>
+      <div id="firstRun" class="first-run" style="display:none;margin:12px 16px 0;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:var(--panel)">
+        <p style="margin:0 0 8px;color:var(--muted);font-size:0.92rem">
+          Ask anything about stocks — concepts or tickers. Educational paper practice. Never places live orders.
+        </p>
+        <button type="button" id="firstRunDismiss" class="chip">Got it</button>
+      </div>
       <div id="thread" aria-live="polite"></div>
       <div class="chips" id="chips"></div>
       <form class="composer" id="form">
@@ -305,11 +312,11 @@
     <script>
       const SUGGESTIONS = [
         "What moves stock prices day to day?",
-        "Explain RSI and when it is useful",
-        "How is NVDA looking on daily technicals?",
-        "What is a PE ratio vs PEG?",
-        "Bull vs bear case for SPY this month",
-        "What should a beginner paper-trade first?",
+        "What is a PE ratio?",
+        "Explain RSI simply",
+        "How does NVDA look on daily technicals?",
+        "What should I paper-trade first?",
+        "What is diversification?",
       ];
 
       const STORAGE_KEY = "indie_trader_api_base";
@@ -364,6 +371,19 @@
       const settings = document.getElementById("settings");
       const apiUrl = document.getElementById("apiUrl");
 
+      const FIRST_RUN_KEY = "indie_trader_first_run_v1";
+      const firstRun = document.getElementById("firstRun");
+      const firstRunDismiss = document.getElementById("firstRunDismiss");
+      if (firstRun && !localStorage.getItem(FIRST_RUN_KEY)) {
+        firstRun.style.display = "block";
+      }
+      if (firstRunDismiss) {
+        firstRunDismiss.onclick = () => {
+          localStorage.setItem(FIRST_RUN_KEY, "1");
+          firstRun.style.display = "none";
+        };
+      }
+
       function addMsg(role, text, tools) {
         const el = document.createElement("div");
         el.className = "msg " + role;
@@ -391,7 +411,7 @@
 
       addMsg(
         "system",
-        "Ask any stock-market question — concepts, tickers, technicals, news context, risk. For live numbers the desk uses market tools. Paper / educational only — never places live orders."
+        "Ask any stock-market question — how things work, or a ticker look. Educational paper practice only. Never places live orders."
       );
 
       SUGGESTIONS.forEach((s) => {
