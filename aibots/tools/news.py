@@ -15,6 +15,7 @@ from datetime import date, timedelta
 import httpx
 
 from aibots.tools import alphavantage as av
+from aibots.tools import bigdata as bigdata_md
 from aibots.tools import massive as massive_md
 
 _FINNHUB_URL = "https://finnhub.io/api/v1/company-news"
@@ -27,7 +28,12 @@ def _finnhub_key() -> str | None:
 
 
 def _any_news_key() -> bool:
-    return bool(_finnhub_key() or massive_md.is_configured() or av.is_configured())
+    return bool(
+        _finnhub_key()
+        or massive_md.is_configured()
+        or av.is_configured()
+        or bigdata_md.is_configured()
+    )
 
 
 def _normalize_finnhub_item(raw: dict) -> dict:
@@ -136,6 +142,16 @@ async def get_news(ticker: str, days: int = 7, limit: int = 10) -> dict:
         except Exception as exc:  # noqa: BLE001
             notes.append(f"alphavantage failed: {exc}")
 
+    if bigdata_md.is_configured():
+        try:
+            bd_news = await bigdata_md.get_news(ticker, limit=limit)
+            if bd_news.get("items"):
+                return _with_fallback_note(bd_news, notes)
+            if bd_news.get("note"):
+                notes.append(str(bd_news["note"]))
+        except Exception as exc:  # noqa: BLE001
+            notes.append(f"bigdata failed: {exc}")
+
     if not _any_news_key():
         return {
             "ticker": ticker,
@@ -143,7 +159,7 @@ async def get_news(ticker: str, days: int = 7, limit: int = 10) -> dict:
             "source": "none",
             "note": (
                 "No news API key configured "
-                "(set FINNHUB_API_KEY, MASSIVE_API_KEY, or ALPHA_VANTAGE_API_KEY)"
+                "(set FINNHUB_API_KEY, MASSIVE_API_KEY, ALPHA_VANTAGE_API_KEY, or BIGDATA_API_KEY)"
             ),
         }
 

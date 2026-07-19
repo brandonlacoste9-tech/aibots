@@ -8,7 +8,9 @@ from aibots.tools.indicators import compute_indicators
 from aibots.tools.market_data import get_price_history
 from aibots.tools.news import get_news
 
-RESEARCH_TOOLS = frozenset({"get_price_history", "compute_indicators", "get_news"})
+RESEARCH_TOOLS = frozenset(
+    {"get_price_history", "compute_indicators", "get_news", "get_company_profile"}
+)
 PROPOSAL_TOOLS = frozenset({"propose_order", "decide_hold"})
 
 
@@ -33,6 +35,10 @@ async def execute_tool(name: str, args: dict[str, Any]) -> Any:
             days=int(args.get("days") or 7),
             limit=int(args.get("limit") or 10),
         )
+    if name == "get_company_profile":
+        from aibots.tools.bigdata import get_company_profile
+
+        return await get_company_profile(ticker=str(args["ticker"]))
     if name == "propose_order":
         return _record_propose_order(args)
     if name == "decide_hold":

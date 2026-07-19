@@ -48,6 +48,7 @@ async def test_missing_api_key_degrades(monkeypatch):
     monkeypatch.delenv("ALPHAVANTAGE_API_KEY", raising=False)
     monkeypatch.delenv("MASSIVE_API_KEY", raising=False)
     monkeypatch.delenv("POLYGON_API_KEY", raising=False)
+    monkeypatch.delenv("BIGDATA_API_KEY", raising=False)
     result = await news.get_news("aapl")
     assert result["ticker"] == "AAPL"
     assert result["items"] == []

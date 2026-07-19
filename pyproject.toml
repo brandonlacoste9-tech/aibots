@@ -14,6 +14,7 @@ dependencies = [
     "openai>=1.40",
     "fastapi>=0.115",
     "uvicorn[standard]>=0.30",
+    "bigdata-client>=2.0",
 ]
 
 [project.optional-dependencies]

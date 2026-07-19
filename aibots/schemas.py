@@ -10,6 +10,7 @@ TOOL_NAMES: list[str] = [
     "get_price_history",
     "compute_indicators",
     "get_news",
+    "get_company_profile",
     "propose_order",
     "decide_hold",
 ]
@@ -77,6 +78,18 @@ _PARAMETERS: dict[str, dict] = {
         "required": ["ticker"],
         "additionalProperties": False,
     },
+    "get_company_profile": {
+        "type": "object",
+        "properties": {
+            "ticker": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Ticker symbol, e.g. AAPL. Resolved via Bigdata knowledge graph.",
+            },
+        },
+        "required": ["ticker"],
+        "additionalProperties": False,
+    },
     "propose_order": {
         "type": "object",
         "properties": {
@@ -104,7 +117,8 @@ _PARAMETERS: dict[str, dict] = {
 _DESCRIPTIONS: dict[str, str] = {
     "get_price_history": "Fetch OHLCV price history for a ticker (yfinance). Returns bars oldest to newest.",
     "compute_indicators": "Compute technical indicators (SMA, RSI, MACD, Bollinger Bands) from OHLCV bars. Pure Python, synchronous.",
-    "get_news": "Fetch recent company news headlines (Finnhub). Returns an empty list with a note if no API key is configured.",
+    "get_news": "Fetch recent company news headlines (Finnhub / Massive / Alpha Vantage / Bigdata). Returns an empty list with a note if no API key is configured.",
+    "get_company_profile": "Resolve a ticker to company metadata via RavenPack Bigdata knowledge graph (name, sector, industry, country, description).",
     "propose_order": "Record a trade proposal for human review. NEVER submits an order to any broker; the returned payload is journaled only.",
     "decide_hold": "Record a decision to hold (no trade). Journaled for later human review.",
 }

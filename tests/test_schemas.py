@@ -6,7 +6,14 @@ import json
 
 from aibots.schemas import TOOL_NAMES, as_anthropic_tools, as_openai_tools
 
-EXPECTED_NAMES = ["get_price_history", "compute_indicators", "get_news", "propose_order", "decide_hold"]
+EXPECTED_NAMES = [
+    "get_price_history",
+    "compute_indicators",
+    "get_news",
+    "get_company_profile",
+    "propose_order",
+    "decide_hold",
+]
 
 
 def test_tool_names_exact_set():

@@ -25,6 +25,7 @@
 | `ALPHA_VANTAGE_API_KEY` | Optional news fallback + quotes; free tier is rate-limited |
 | `MASSIVE_API_KEY` | Optional Massive/Polygon news + prev-close |
 | `MASSIVE_BASE_URL` | Optional; default `https://api.polygon.io` |
+| `BIGDATA_API_KEY` | Optional RavenPack Bigdata (`bd_v2_…`) company KG / news |
 | `AIBOTS_JOURNAL_PATH` | Optional path; no secret |
 
 If a key was pasted into chat, treat it as exposed: rotate at the provider when practical.
