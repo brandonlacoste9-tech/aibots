@@ -44,11 +44,13 @@ class _FakeClient:
 @pytest.mark.asyncio
 async def test_missing_api_key_degrades(monkeypatch):
     monkeypatch.delenv("FINNHUB_API_KEY", raising=False)
+    monkeypatch.delenv("ALPHA_VANTAGE_API_KEY", raising=False)
+    monkeypatch.delenv("ALPHAVANTAGE_API_KEY", raising=False)
     result = await news.get_news("aapl")
     assert result["ticker"] == "AAPL"
     assert result["items"] == []
     assert result["source"] == "none"
-    assert "FINNHUB_API_KEY" in result["note"]
+    assert "API key" in result["note"] or "ALPHA" in result["note"] or "FINNHUB" in result["note"]
 
 
 @pytest.mark.asyncio
@@ -113,3 +115,30 @@ async def test_blank_ticker_raises(monkeypatch):
     monkeypatch.setenv("FINNHUB_API_KEY", "k")
     with pytest.raises(ValueError):
         await news.get_news("  ")
+
+
+@pytest.mark.asyncio
+async def test_alphavantage_fallback_when_no_finnhub(monkeypatch):
+    monkeypatch.delenv("FINNHUB_API_KEY", raising=False)
+    monkeypatch.setenv("ALPHA_VANTAGE_API_KEY", "av-key")
+
+    async def fake_av_news(ticker, limit=10):
+        return {
+            "ticker": ticker,
+            "items": [
+                {
+                    "headline": "AV headline",
+                    "datetime": "2024-01-01T00:00:00Z",
+                    "source": "AV",
+                    "url": "https://example.com",
+                }
+            ],
+            "source": "alphavantage",
+        }
+
+    monkeypatch.setattr(news.av, "is_configured", lambda: True)
+    monkeypatch.setattr(news.av, "get_news", fake_av_news)
+
+    result = await news.get_news("MSFT")
+    assert result["source"] == "alphavantage"
+    assert result["items"][0]["headline"] == "AV headline"

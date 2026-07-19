@@ -13,6 +13,7 @@ Environment:
 from __future__ import annotations
 
 import os
+from pathlib import Path
 from typing import Any
 
 from fastapi import FastAPI, HTTPException
@@ -22,6 +23,16 @@ from pydantic import BaseModel, Field
 from aibots import __version__
 from aibots.agent.market_chat import run_market_chat
 from aibots.journal import append_entry
+
+try:
+    from dotenv import load_dotenv
+
+    for _candidate in (Path.cwd() / ".env", Path(__file__).resolve().parents[1] / ".env"):
+        if _candidate.is_file():
+            load_dotenv(_candidate, override=False)
+            break
+except ImportError:
+    pass
 
 DEFAULT_CORS = (
     "http://localhost:3000,"

@@ -21,9 +21,11 @@
 | Secret | Where |
 |--------|--------|
 | `XAI_API_KEY` | Local `.env` / API host (Render etc.) — **not** Netlify static site |
-| `FINNHUB_API_KEY` | Optional; same as above |
+| `FINNHUB_API_KEY` | Optional news; same host as above |
+| `ALPHA_VANTAGE_API_KEY` | Optional news fallback + quotes; free tier is rate-limited |
 | `AIBOTS_JOURNAL_PATH` | Optional path; no secret |
 
+If a key was pasted into chat, treat it as exposed: rotate at the provider when practical.
 Marketing site on Netlify is static HTML only — **no** LLM keys required there.
 
 ## Repo guards

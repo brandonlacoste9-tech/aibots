@@ -15,6 +15,7 @@ import argparse
 import asyncio
 import os
 import sys
+from pathlib import Path
 from typing import Any
 
 from aibots.agent.loop import run_research_turn
@@ -24,6 +25,18 @@ from aibots.tools.indicators import compute_indicators
 from aibots.tools.market_data import get_price_history
 
 EXIT_USAGE = 2  # argparse convention for usage/config errors
+
+
+def _load_dotenv() -> None:
+    """Load .env from cwd or package root if python-dotenv is available."""
+    try:
+        from dotenv import load_dotenv
+    except ImportError:
+        return
+    for candidate in (Path.cwd() / ".env", Path(__file__).resolve().parents[1] / ".env"):
+        if candidate.is_file():
+            load_dotenv(candidate, override=False)
+            return
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -84,6 +97,7 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def main(argv: list[str] | None = None) -> int:
+    _load_dotenv()
     args = build_parser().parse_args(argv)
     return args.func(args)
 

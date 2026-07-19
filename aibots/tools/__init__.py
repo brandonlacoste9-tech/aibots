@@ -10,6 +10,7 @@ __all__ = [
     "market_data",
     "indicators",
     "news",
+    "alphavantage",
     "get_price_history",
     "compute_indicators",
     "get_news",
