@@ -361,6 +361,55 @@
       footer a {
         color: var(--accent);
       }
+      .grid4 {
+        display: grid;
+        gap: 12px;
+        grid-template-columns: 1fr;
+      }
+      @media (min-width: 760px) {
+        .grid4 {
+          grid-template-columns: repeat(2, 1fr);
+        }
+      }
+      @media (min-width: 980px) {
+        .grid4 {
+          grid-template-columns: repeat(4, 1fr);
+        }
+      }
+      .mock-chat {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        padding: 16px;
+      }
+      .mock-msg {
+        max-width: 92%;
+        border-radius: 12px;
+        padding: 12px 14px;
+        font-size: 0.92rem;
+        line-height: 1.5;
+      }
+      .mock-msg.user {
+        align-self: flex-end;
+        background: rgba(91, 156, 255, 0.16);
+        border: 1px solid rgba(91, 156, 255, 0.35);
+        color: var(--text);
+      }
+      .mock-msg.assistant {
+        align-self: flex-start;
+        background: #0a1018;
+        border: 1px solid var(--line);
+        color: #c7d3e3;
+      }
+      .mock-msg .who {
+        display: block;
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 0.7rem;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--muted);
+        margin-bottom: 6px;
+      }
     </style>
   </head>
   <body>
@@ -429,12 +478,42 @@
       </section>
 
       <section class="section" id="how">
-        <h2>How the bot works</h2>
+        <h2>How the control plane works</h2>
         <p>
-          Not a black-box “auto trader.” Every research turn is forced through
-          tools, then balanced before you confirm.
+          Not a black-box auto trader. The desk looks things up, shows both sides,
+          and leaves the decision with you.
         </p>
-        <div class="card" style="margin-bottom: 14px">
+        <div class="grid3">
+          <div class="card">
+            <div class="n">01</div>
+            <h3>Look up real context</h3>
+            <p>
+              Prices, indicators, and headlines when needed — numbers from tools,
+              not the model’s memory.
+            </p>
+          </div>
+          <div class="card">
+            <div class="n">02</div>
+            <h3>See both sides</h3>
+            <p>
+              A constructive take and the risks (bull/bear framing) on the same
+              data so you can weigh the trade-offs.
+            </p>
+          </div>
+          <div class="card">
+            <div class="n">03</div>
+            <h3>You decide</h3>
+            <p>
+              Paper practice only. Nothing silent-submits — you stay in the loop
+              on every idea.
+            </p>
+          </div>
+        </div>
+        <p style="margin-top: 16px; margin-bottom: 0">
+          Ideas can be journaled for review. The desk answers questions; it does
+          not trade your brokerage account.
+        </p>
+        <div class="card" style="margin-top: 14px">
           <div class="pipeline" aria-label="Pipeline">
             <span class="step">price history</span>
             <span class="arrow">→</span>
@@ -449,71 +528,96 @@
             <span class="step">you confirm</span>
           </div>
         </div>
-        <div class="grid3">
-          <div class="card">
-            <div class="n">01</div>
-            <h3>Forced research</h3>
-            <p>
-              History, indicators, and headlines run before any proposal. Numbers
-              come from tools — not the model’s memory.
-            </p>
-          </div>
-          <div class="card">
-            <div class="n">02</div>
-            <h3>Bull + bear</h3>
-            <p>
-              One proposal, one skeptical critique on the same data. You review
-              both sides in preflight.
-            </p>
-          </div>
-          <div class="card">
-            <div class="n">03</div>
-            <h3>Human gate</h3>
-            <p>
-              Proposals are record-only until you approve inside a TTL. The bot
-              never submits live brokerage orders.
-            </p>
-          </div>
-        </div>
       </section>
 
       <section class="section" id="safety">
-        <h2>Built for honest paper trading</h2>
+        <h2>Safety you can trust</h2>
         <p>
-          Designed for people who want AI help without giving up the control
-          plane.
+          Built for honest paper practice — AI help without handing over the
+          control plane.
         </p>
-        <div class="grid3">
+        <div class="grid4">
+          <div class="card">
+            <h3>Paper only</h3>
+            <p>
+              Practice ideas on paper. This site is for learning and journaling,
+              not live brokerage execution.
+            </p>
+          </div>
           <div class="card">
             <h3>No silent fills</h3>
             <p>
-              <code>propose_order</code> / <code>decide_hold</code> journal only.
-              <code>submitted: false</code> until a human path says otherwise.
+              No live order submission from this site. Proposals journal only —
+              nothing silently fills or routes to a broker.
             </p>
           </div>
           <div class="card">
-            <h3>Auditable journal</h3>
+            <h3>Market numbers from tools</h3>
             <p>
-              Tool outputs, bull thesis, bear critique, and your decision land
-              side by side for later scorekeeping.
+              When the desk cites data, market numbers come from tools — prices,
+              indicators, and headlines looked up for that turn.
             </p>
           </div>
           <div class="card">
-            <h3>Cloud-safe data</h3>
+            <h3>You stay in control</h3>
             <p>
-              EOD/history via public feeds; optional Finnhub news. Broker market
-              data stays where you put it.
+              You review both sides and decide. The AI proposes; it does not
+              trade your account.
             </p>
           </div>
         </div>
+        <div class="card" style="margin-top: 14px">
+          <h3>Example journal entry <span style="font-size:0.75rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em;margin-left:8px">Example only</span></h3>
+          <p style="color:var(--muted);font-size:0.85rem">Illustrative — not live account data.</p>
+          <pre style="margin-top:10px;padding:14px;background:#0a1018;border:1px solid var(--line);border-radius:10px;overflow-x:auto;font-family:IBM Plex Mono,monospace;font-size:0.82rem;color:#c9d7ea">tools: get_price_history, compute_indicators, get_news
+bull: "Trend constructive on paper; small size."
+bear: "Extended into resistance; wait for pullback risk."
+human_decision: pending</pre>
+        </div>
+      </section>
+
+      <section class="section" id="preview">
+        <h2>Try the desk</h2>
+        <p>
+          Ask freeform market questions in plain English. Here is what a first
+          exchange can look like.
+        </p>
+        <div class="panel" aria-label="Example desk conversation (non-interactive)">
+          <div class="panel-top">
+            <span>Desk preview</span>
+            <span class="ttl">Example only</span>
+          </div>
+          <div class="mock-chat">
+            <div class="mock-msg user">
+              <span class="who">You</span>
+              What is a PE ratio?
+            </div>
+            <div class="mock-msg assistant">
+              <span class="who">Desk</span>
+              A P/E (price-to-earnings) ratio compares a stock’s price to its
+              earnings per share. Roughly: how many dollars investors pay for
+              each dollar of earnings. Higher often means growth expectations
+              or a richer valuation; lower can mean cheaper or weaker outlook —
+              always read it next to peers and the company’s story.
+            </div>
+          </div>
+        </div>
+        <p style="margin-top: 16px; margin-bottom: 0">
+          <a class="btn btn-primary" href="/desk">Ask your first question</a>
+        </p>
       </section>
 
       <section class="section" id="cli">
         <h2>Get started</h2>
         <p>
-          Open the web desk for freeform market Q&amp;A, or run the API + CLI
-          locally.
+          Start in the browser desk for freeform market Q&amp;A. CLI and API are
+          optional if you want to run things locally.
         </p>
+        <p style="margin-bottom: 18px">
+          <a class="btn btn-primary" href="/desk">Open desk</a>
+          <a class="btn btn-ghost" href="https://github.com/brandonlacoste9-tech/aibots" style="margin-left: 8px">CLI on GitHub</a>
+        </p>
+        <p class="fine" style="margin-bottom: 10px">Optional — run the API + CLI yourself:</p>
         <pre>git clone https://github.com/brandonlacoste9-tech/aibots
 cd aibots
 pip install -e ".[dev]"
@@ -528,9 +632,6 @@ python -m aibots serve --port 8080
 
 # Forced research + bear critic
 python -m aibots research AAPL</pre>
-        <p style="margin-top: 14px">
-          <a class="btn btn-primary" href="/desk">Open desk in browser</a>
-        </p>
       </section>
 
       <footer>
@@ -538,7 +639,7 @@ python -m aibots research AAPL</pre>
           <strong style="color: var(--text)">Indie Trader</strong>
           · indie-trader.com
           <br />
-          AI trading bot for paper practice. Not financial advice. Not a live
+          AI trading bot for paper practice. Not financial advice. Not a
           broker.
         </div>
         <div>
